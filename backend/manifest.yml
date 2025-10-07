@@ -1,0 +1,57 @@
+name: MoonCookies
+entities:
+  User:
+    authenticable: true
+    properties:
+      - name
+      - { name: email, type: email }
+      - { name: role, type: choice, options: { values: [astronaut, customer] }, default: customer }
+    policies:
+      create:
+        - access: admin
+      read:
+        - access: restricted
+          allow: User
+          condition: self
+      update:
+        - access: restricted
+          allow: User
+          condition: self
+      delete:
+        - access: admin
+      signup:
+        - access: public
+
+  Cookie:
+    properties:
+      - { name: name, type: string }
+      - { name: description, type: text }
+      - { name: price, type: money, options: { currency: 'USD' } }
+      - { name: photo, type: image, options: { sizes: { thumbnail: { width: 400, height: 400 } } } }
+      - { name: inventory, type: number, default: 0 }
+      - { name: bakingStatus, type: choice, options: { values: [dough, in_the_oven, ready_for_sale] }, default: dough }
+    belongsTo:
+      - { name: owner, entity: User }
+    policies:
+      create:
+        - access: restricted
+          allow: User
+      read:
+        - access: public
+      update:
+        - access: restricted
+          allow: User
+          condition: self
+      delete:
+        - access: restricted
+          allow: User
+          condition: self
+
+
+# Health check endpoint for connection testing
+endpoints:
+  health:
+    path: /api/health
+    method: GET
+    policies: []
+    handler: healthCheck
